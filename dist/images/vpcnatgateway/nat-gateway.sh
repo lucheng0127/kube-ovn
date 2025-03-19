@@ -60,6 +60,68 @@ function init() {
     done
 }
 
+function ipip_add() {
+    # make sure inited
+    check_inited
+
+    # add ipip link
+    for rule in $@
+    do
+        arr=(${rule//,/ })
+        lip=${arr[0]}
+        rip=${arr[1]}
+
+        if [ ! -z $rip ]; then
+            ip link add ipip0 type ipip local $lip remote $rip
+        else
+            ip link add ipip0 type ipip local $lip
+        fi
+        ip l set ipip0 up
+    done
+}
+
+function ipip_del() {
+    ip l | grep ipip0 | ip l del ipip0
+}
+
+function bms_subnet_route_add() {
+    # make sure inited
+    check_inited
+
+    # redirect bms traffic to bms vpc gateway
+    for rule in $@
+    do
+        arr=(${rule//,/ })
+        gwip=${arr[0]}
+        gwip_without_netmask=(${gwip//\// })
+        gw_network=$(ipcalc -n $gwip | awk -F '=' '{print $2}')
+        gw_netmask=$(ipcalc -p $gwip | awk -F '=' '{print $2}')
+
+        # it's necessary to redirect all bms traffic to bms vpc gateway
+        # nor we can't split different traffic to bms instance that belong to different vpc
+        default_gw=`ip r | grep default | awk '{ print $3 }'`
+        ip r add $gwip_without_netmask/32 via $default_gw dev net1
+        ip r replace $gw_network/$gw_netmask via $gwip_without_netmask dev ipip0 onlink
+    done
+}
+
+function bms_subnet_route_del() {
+    # make sure inited
+    check_inited
+
+    # redirect bms traffic to bms vpc gateway
+    for rule in $@
+    do
+        arr=(${rule//,/ })
+        gwip=${arr[0]}
+        gwip_without_netmask=(${gwip//\// })
+        gw_network=$(ipcalc -n $gwip | awk -F '=' '{print $2}')
+        gw_netmask=$(ipcalc -p $gwip | awk -F '=' '{print $2}')
+
+        ip r del $gwip_without_netmask
+        ip r del $gw_network/$gw_netmask
+    done
+}
 
 function get_iptables_version() {
   exec_cmd "$iptables_cmd --version"
@@ -532,6 +594,22 @@ case $opt in
  qos-del)
         echo "qos-del $rules"
         qos_del $rules
+        ;;
+ ipip-add)
+        echo "ipip-add $rules"
+        ipip_add $rules
+        ;;
+ ipip-del)
+        echo "ipip-del"
+        ipip_del
+        ;;
+ bms-subnet-route-add)
+        echo "bms-subnet-route-add $rules"
+        bms_subnet_route_add $rules
+        ;;
+ bms-subnet-route-del)
+        echo "bms-subnet-route-add $rules"
+        bms_subnet_route_del $rules
         ;;
  *)
         echo "Usage: $0 [init|subnet-route-add|subnet-route-del|eip-add|eip-del|floating-ip-add|floating-ip-del|dnat-add|dnat-del|snat-add|snat-del] ..."
