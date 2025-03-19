@@ -34,7 +34,7 @@ type FakeVpcBmsConnections struct {
 	Fake *FakeKubeovnV1
 }
 
-var vpcbmsconnectionsResource = v1.SchemeGroupVersion.WithResource("vpc-bms-connection")
+var vpcbmsconnectionsResource = v1.SchemeGroupVersion.WithResource("vpcbmsconnections")
 
 var vpcbmsconnectionsKind = v1.SchemeGroupVersion.WithKind("VpcBmsConnection")
 

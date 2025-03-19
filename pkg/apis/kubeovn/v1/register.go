@@ -71,6 +71,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&VpcDnsList{},
 		&QoSPolicy{},
 		&QoSPolicyList{},
+		&VpcNatGatewayIpip{},
+		&VpcNatGatewayIpipList{},
+		&VpcBmsConnection{},
+		&VpcBmsConnectionList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

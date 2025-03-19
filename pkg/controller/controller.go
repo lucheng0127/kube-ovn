@@ -75,6 +75,16 @@ type Controller struct {
 	updateVpcStatusQueue workqueue.RateLimitingInterface
 	vpcKeyMutex          keymutex.KeyMutex
 
+	vpcNatGatewayIpipLister kubeovnlister.VpcNatGatewayIpipLister
+	vpcNatGatewayIpipSynced cache.InformerSynced
+	vpcBmsConnectionLister  kubeovnlister.VpcBmsConnectionLister
+	vpcBmsConnectionSynced  cache.InformerSynced
+
+	addOrUpdateVpcNatGatewayIpipQueue workqueue.RateLimitingInterface
+	delVpcNatGatewayIpipQueue         workqueue.RateLimitingInterface
+	addOrUpdateVpcBmsConnectionQueue  workqueue.RateLimitingInterface
+	delVpcBmsConnectionQueue          workqueue.RateLimitingInterface
+
 	vpcNatGatewayLister           kubeovnlister.VpcNatGatewayLister
 	vpcNatGatewaySynced           cache.InformerSynced
 	addOrUpdateVpcNatGatewayQueue workqueue.RateLimitingInterface
@@ -262,6 +272,9 @@ func Run(ctx context.Context, config *Configuration) {
 			listOption.AllowWatchBookmarks = true
 		}))
 
+	vpcNatGatewayIpipInformer := kubeovnInformerFactory.Kubeovn().V1().VpcNatGatewayIpips()
+	vpcBmsConnectionInformer := kubeovnInformerFactory.Kubeovn().V1().VpcBmsConnections()
+
 	vpcInformer := kubeovnInformerFactory.Kubeovn().V1().Vpcs()
 	vpcNatGatewayInformer := kubeovnInformerFactory.Kubeovn().V1().VpcNatGateways()
 	subnetInformer := kubeovnInformerFactory.Kubeovn().V1().Subnets()
@@ -309,6 +322,16 @@ func Run(ctx context.Context, config *Configuration) {
 		delVpcQueue:          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "DeleteVpc"),
 		updateVpcStatusQueue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "UpdateVpcStatus"),
 		vpcKeyMutex:          keymutex.NewHashed(numKeyLocks),
+
+		vpcNatGatewayIpipLister:           vpcNatGatewayIpipInformer.Lister(),
+		vpcNatGatewayIpipSynced:           vpcNatGatewayInformer.Informer().HasSynced,
+		addOrUpdateVpcNatGatewayIpipQueue: workqueue.NewNamedRateLimitingQueue(custCrdRateLimiter, "AddOrUpdateVpcNatGwIpip"),
+		delVpcNatGatewayIpipQueue:         workqueue.NewNamedRateLimitingQueue(custCrdRateLimiter, "DeleteVpcNatGwIpip"),
+
+		vpcBmsConnectionLister:           vpcBmsConnectionInformer.Lister(),
+		vpcBmsConnectionSynced:           vpcBmsConnectionInformer.Informer().HasSynced,
+		addOrUpdateVpcBmsConnectionQueue: workqueue.NewNamedRateLimitingQueue(custCrdRateLimiter, "AddOrUpdateVpcBmsConnection"),
+		delVpcBmsConnectionQueue:         workqueue.NewNamedRateLimitingQueue(custCrdRateLimiter, "DeleteVpcBmsConnection"),
 
 		vpcNatGatewayLister:           vpcNatGatewayInformer.Lister(),
 		vpcNatGatewaySynced:           vpcNatGatewayInformer.Informer().HasSynced,
@@ -518,7 +541,7 @@ func Run(ctx context.Context, config *Configuration) {
 		controller.vlanSynced, controller.podsSynced, controller.namespacesSynced, controller.nodesSynced,
 		controller.serviceSynced, controller.endpointsSynced, controller.configMapsSynced,
 		controller.ovnEipSynced, controller.ovnFipSynced, controller.ovnSnatRuleSynced,
-		controller.ovnDnatRuleSynced,
+		controller.ovnDnatRuleSynced, controller.vpcNatGatewayIpipSynced, controller.vpcBmsConnectionSynced,
 	}
 	if controller.config.EnableLb {
 		cacheSyncs = append(cacheSyncs, controller.switchLBRuleSynced, controller.vpcDNSSynced)
@@ -575,6 +598,22 @@ func Run(ctx context.Context, config *Configuration) {
 		DeleteFunc: controller.enqueueDelVpc,
 	}); err != nil {
 		util.LogFatalAndExit(err, "failed to add vpc event handler")
+	}
+
+	if _, err = vpcNatGatewayIpipInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    controller.enqueueAddVpcNatGwIpip,
+		UpdateFunc: controller.enqueueUpdateVpcNatGwIpip,
+		DeleteFunc: controller.enqueueDeleteVpcNatGwIpip,
+	}); err != nil {
+		util.LogFatalAndExit(err, "failed to add vpc nat gateway ipip event handler")
+	}
+
+	if _, err = vpcBmsConnectionInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    controller.enqueueAddVpcBmsConnection,
+		UpdateFunc: controller.enqueueUpdateVpcBmsConnection,
+		DeleteFunc: controller.enqueueDeleteVpcBmsConnection,
+	}); err != nil {
+		util.LogFatalAndExit(err, "failed to add vpc bms connection event handler")
 	}
 
 	if _, err = vpcNatGatewayInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -835,6 +874,11 @@ func (c *Controller) shutdown() {
 	c.updateVpcStatusQueue.ShutDown()
 	c.delVpcQueue.ShutDown()
 
+	c.addOrUpdateVpcNatGatewayIpipQueue.ShutDown()
+	c.delVpcNatGatewayIpipQueue.ShutDown()
+	c.addOrUpdateVpcBmsConnectionQueue.ShutDown()
+	c.delVpcBmsConnectionQueue.ShutDown()
+
 	c.addOrUpdateVpcNatGatewayQueue.ShutDown()
 	c.initVpcNatGatewayQueue.ShutDown()
 	c.delVpcNatGatewayQueue.ShutDown()
@@ -912,6 +956,12 @@ func (c *Controller) startWorkers(ctx context.Context) {
 	klog.Info("Starting workers")
 
 	go wait.Until(c.runAddVpcWorker, time.Second, ctx.Done())
+
+	go wait.Until(c.runAddOrUpdateVpcNatGwIpipWorker, time.Second, ctx.Done())
+	go wait.Until(c.runDelVpcNatGwIpipWorker, time.Second, ctx.Done())
+
+	go wait.Until(c.runAddOrUpdateVpcBmsConnectionWorker, time.Second, ctx.Done())
+	go wait.Until(c.runDelVpcBmsConnectionWorker, time.Second, ctx.Done())
 
 	go wait.Until(c.runAddOrUpdateVpcNatGwWorker, time.Second, ctx.Done())
 	go wait.Until(c.runInitVpcNatGwWorker, time.Second, ctx.Done())

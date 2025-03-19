@@ -66,7 +66,7 @@ func newVpcBmsConnections(c *KubeovnV1Client) *vpcBmsConnections {
 func (c *vpcBmsConnections) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.VpcBmsConnection, err error) {
 	result = &v1.VpcBmsConnection{}
 	err = c.client.Get().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do(ctx).
@@ -82,7 +82,7 @@ func (c *vpcBmsConnections) List(ctx context.Context, opts metav1.ListOptions) (
 	}
 	result = &v1.VpcBmsConnectionList{}
 	err = c.client.Get().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do(ctx).
@@ -98,7 +98,7 @@ func (c *vpcBmsConnections) Watch(ctx context.Context, opts metav1.ListOptions) 
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch(ctx)
@@ -108,7 +108,7 @@ func (c *vpcBmsConnections) Watch(ctx context.Context, opts metav1.ListOptions) 
 func (c *vpcBmsConnections) Create(ctx context.Context, vpcBmsConnection *v1.VpcBmsConnection, opts metav1.CreateOptions) (result *v1.VpcBmsConnection, err error) {
 	result = &v1.VpcBmsConnection{}
 	err = c.client.Post().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(vpcBmsConnection).
 		Do(ctx).
@@ -120,7 +120,7 @@ func (c *vpcBmsConnections) Create(ctx context.Context, vpcBmsConnection *v1.Vpc
 func (c *vpcBmsConnections) Update(ctx context.Context, vpcBmsConnection *v1.VpcBmsConnection, opts metav1.UpdateOptions) (result *v1.VpcBmsConnection, err error) {
 	result = &v1.VpcBmsConnection{}
 	err = c.client.Put().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		Name(vpcBmsConnection.Name).
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(vpcBmsConnection).
@@ -134,7 +134,7 @@ func (c *vpcBmsConnections) Update(ctx context.Context, vpcBmsConnection *v1.Vpc
 func (c *vpcBmsConnections) UpdateStatus(ctx context.Context, vpcBmsConnection *v1.VpcBmsConnection, opts metav1.UpdateOptions) (result *v1.VpcBmsConnection, err error) {
 	result = &v1.VpcBmsConnection{}
 	err = c.client.Put().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		Name(vpcBmsConnection.Name).
 		SubResource("status").
 		VersionedParams(&opts, scheme.ParameterCodec).
@@ -147,7 +147,7 @@ func (c *vpcBmsConnections) UpdateStatus(ctx context.Context, vpcBmsConnection *
 // Delete takes name of the vpcBmsConnection and deletes it. Returns an error if one occurs.
 func (c *vpcBmsConnections) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		Name(name).
 		Body(&opts).
 		Do(ctx).
@@ -161,7 +161,7 @@ func (c *vpcBmsConnections) DeleteCollection(ctx context.Context, opts metav1.De
 		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(&opts).
@@ -173,7 +173,7 @@ func (c *vpcBmsConnections) DeleteCollection(ctx context.Context, opts metav1.De
 func (c *vpcBmsConnections) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.VpcBmsConnection, err error) {
 	result = &v1.VpcBmsConnection{}
 	err = c.client.Patch(pt).
-		Resource("vpc-bms-connection").
+		Resource("vpcbmsconnections").
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).

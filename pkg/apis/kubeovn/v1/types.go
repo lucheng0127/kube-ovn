@@ -535,7 +535,6 @@ type VpcNatStatus struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient:nonNamespaced
-// +resourceName=vpc-bms-connection
 
 type VpcBmsConnection struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -567,7 +566,6 @@ type VpcBmsConnectionList struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient:nonNamespaced
-// +resourceName=vpc-nat-gateway-ipip
 
 type VpcNatGatewayIpip struct {
 	metav1.TypeMeta   `json:",inline"`

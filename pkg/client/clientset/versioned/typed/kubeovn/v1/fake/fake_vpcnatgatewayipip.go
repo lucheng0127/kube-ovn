@@ -34,7 +34,7 @@ type FakeVpcNatGatewayIpips struct {
 	Fake *FakeKubeovnV1
 }
 
-var vpcnatgatewayipipsResource = v1.SchemeGroupVersion.WithResource("vpc-nat-gateway-ipip")
+var vpcnatgatewayipipsResource = v1.SchemeGroupVersion.WithResource("vpcnatgatewayipips")
 
 var vpcnatgatewayipipsKind = v1.SchemeGroupVersion.WithKind("VpcNatGatewayIpip")
 

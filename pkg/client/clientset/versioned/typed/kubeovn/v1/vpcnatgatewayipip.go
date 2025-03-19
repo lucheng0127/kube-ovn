@@ -66,7 +66,7 @@ func newVpcNatGatewayIpips(c *KubeovnV1Client) *vpcNatGatewayIpips {
 func (c *vpcNatGatewayIpips) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.VpcNatGatewayIpip, err error) {
 	result = &v1.VpcNatGatewayIpip{}
 	err = c.client.Get().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do(ctx).
@@ -82,7 +82,7 @@ func (c *vpcNatGatewayIpips) List(ctx context.Context, opts metav1.ListOptions) 
 	}
 	result = &v1.VpcNatGatewayIpipList{}
 	err = c.client.Get().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do(ctx).
@@ -98,7 +98,7 @@ func (c *vpcNatGatewayIpips) Watch(ctx context.Context, opts metav1.ListOptions)
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch(ctx)
@@ -108,7 +108,7 @@ func (c *vpcNatGatewayIpips) Watch(ctx context.Context, opts metav1.ListOptions)
 func (c *vpcNatGatewayIpips) Create(ctx context.Context, vpcNatGatewayIpip *v1.VpcNatGatewayIpip, opts metav1.CreateOptions) (result *v1.VpcNatGatewayIpip, err error) {
 	result = &v1.VpcNatGatewayIpip{}
 	err = c.client.Post().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(vpcNatGatewayIpip).
 		Do(ctx).
@@ -120,7 +120,7 @@ func (c *vpcNatGatewayIpips) Create(ctx context.Context, vpcNatGatewayIpip *v1.V
 func (c *vpcNatGatewayIpips) Update(ctx context.Context, vpcNatGatewayIpip *v1.VpcNatGatewayIpip, opts metav1.UpdateOptions) (result *v1.VpcNatGatewayIpip, err error) {
 	result = &v1.VpcNatGatewayIpip{}
 	err = c.client.Put().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		Name(vpcNatGatewayIpip.Name).
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(vpcNatGatewayIpip).
@@ -134,7 +134,7 @@ func (c *vpcNatGatewayIpips) Update(ctx context.Context, vpcNatGatewayIpip *v1.V
 func (c *vpcNatGatewayIpips) UpdateStatus(ctx context.Context, vpcNatGatewayIpip *v1.VpcNatGatewayIpip, opts metav1.UpdateOptions) (result *v1.VpcNatGatewayIpip, err error) {
 	result = &v1.VpcNatGatewayIpip{}
 	err = c.client.Put().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		Name(vpcNatGatewayIpip.Name).
 		SubResource("status").
 		VersionedParams(&opts, scheme.ParameterCodec).
@@ -147,7 +147,7 @@ func (c *vpcNatGatewayIpips) UpdateStatus(ctx context.Context, vpcNatGatewayIpip
 // Delete takes name of the vpcNatGatewayIpip and deletes it. Returns an error if one occurs.
 func (c *vpcNatGatewayIpips) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		Name(name).
 		Body(&opts).
 		Do(ctx).
@@ -161,7 +161,7 @@ func (c *vpcNatGatewayIpips) DeleteCollection(ctx context.Context, opts metav1.D
 		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(&opts).
@@ -173,7 +173,7 @@ func (c *vpcNatGatewayIpips) DeleteCollection(ctx context.Context, opts metav1.D
 func (c *vpcNatGatewayIpips) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.VpcNatGatewayIpip, err error) {
 	result = &v1.VpcNatGatewayIpip{}
 	err = c.client.Patch(pt).
-		Resource("vpc-nat-gateway-ipip").
+		Resource("vpcnatgatewayipips").
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
