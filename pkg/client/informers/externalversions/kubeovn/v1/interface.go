@@ -60,10 +60,14 @@ type Interface interface {
 	Vlans() VlanInformer
 	// Vpcs returns a VpcInformer.
 	Vpcs() VpcInformer
+	// VpcBmsConnections returns a VpcBmsConnectionInformer.
+	VpcBmsConnections() VpcBmsConnectionInformer
 	// VpcDnses returns a VpcDnsInformer.
 	VpcDnses() VpcDnsInformer
 	// VpcNatGateways returns a VpcNatGatewayInformer.
 	VpcNatGateways() VpcNatGatewayInformer
+	// VpcNatGatewayIpips returns a VpcNatGatewayIpipInformer.
+	VpcNatGatewayIpips() VpcNatGatewayIpipInformer
 }
 
 type version struct {
@@ -167,6 +171,11 @@ func (v *version) Vpcs() VpcInformer {
 	return &vpcInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
+// VpcBmsConnections returns a VpcBmsConnectionInformer.
+func (v *version) VpcBmsConnections() VpcBmsConnectionInformer {
+	return &vpcBmsConnectionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
 // VpcDnses returns a VpcDnsInformer.
 func (v *version) VpcDnses() VpcDnsInformer {
 	return &vpcDnsInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
@@ -175,4 +184,9 @@ func (v *version) VpcDnses() VpcDnsInformer {
 // VpcNatGateways returns a VpcNatGatewayInformer.
 func (v *version) VpcNatGateways() VpcNatGatewayInformer {
 	return &vpcNatGatewayInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// VpcNatGatewayIpips returns a VpcNatGatewayIpipInformer.
+func (v *version) VpcNatGatewayIpips() VpcNatGatewayIpipInformer {
+	return &vpcNatGatewayIpipInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

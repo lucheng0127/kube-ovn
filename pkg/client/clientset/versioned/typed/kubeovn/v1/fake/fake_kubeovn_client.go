@@ -100,12 +100,20 @@ func (c *FakeKubeovnV1) Vpcs() v1.VpcInterface {
 	return &FakeVpcs{c}
 }
 
+func (c *FakeKubeovnV1) VpcBmsConnections() v1.VpcBmsConnectionInterface {
+	return &FakeVpcBmsConnections{c}
+}
+
 func (c *FakeKubeovnV1) VpcDnses() v1.VpcDnsInterface {
 	return &FakeVpcDnses{c}
 }
 
 func (c *FakeKubeovnV1) VpcNatGateways() v1.VpcNatGatewayInterface {
 	return &FakeVpcNatGateways{c}
+}
+
+func (c *FakeKubeovnV1) VpcNatGatewayIpips() v1.VpcNatGatewayIpipInterface {
+	return &FakeVpcNatGatewayIpips{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

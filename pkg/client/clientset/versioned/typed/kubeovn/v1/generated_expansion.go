@@ -54,6 +54,10 @@ type VlanExpansion interface{}
 
 type VpcExpansion interface{}
 
+type VpcBmsConnectionExpansion interface{}
+
 type VpcDnsExpansion interface{}
 
 type VpcNatGatewayExpansion interface{}
+
+type VpcNatGatewayIpipExpansion interface{}

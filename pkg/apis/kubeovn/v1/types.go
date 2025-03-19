@@ -535,6 +535,71 @@ type VpcNatStatus struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient:nonNamespaced
+// +resourceName=vpc-bms-connection
+
+type VpcBmsConnection struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   VpcBmsConnectionSpec   `json:"spec"`
+	Status VpcBmsConnectionStatus `json:"status,omitempty"`
+}
+
+type VpcBmsConnectionSpec struct {
+	GwV4Ip string `json:"gwv4ip"`
+}
+
+type VpcBmsConnectionStatus struct {
+	Ready     bool `json:"ready" patchStrategy:"merge"`
+	BmsSubnet bool `json:"bmsSubnet" patchStrategy:"merge"`
+	BmsGw     bool `json:"bmsGw" patchStrategy:"merge"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+type VpcBmsConnectionList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+
+	Items []VpcBmsConnection `json:"items"`
+}
+
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient:nonNamespaced
+// +resourceName=vpc-nat-gateway-ipip
+
+type VpcNatGatewayIpip struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   VpcNatGatewayIpipSpec   `json:"spec"`
+	Status VpcNatGatewayIpipStatus `json:"status,omitempty"`
+}
+
+type VpcNatGatewayIpipSpec struct {
+	LocalV4Ip  string `json:"lv4ip"`
+	RemoteV4Ip string `json:"rv4ip,omitempty"`
+}
+
+type VpcNatGatewayIpipStatus struct {
+	Ready    bool `json:"ready" patchStrategy:"merge"`
+	LocalIP  bool `json:"localIp" patchStrategy:"merge"`
+	RemoteIP bool `json:"remoteIp" patchStrategy:"merge"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+type VpcNatGatewayIpipList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+
+	Items []VpcNatGatewayIpip `json:"items"`
+}
+
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient:nonNamespaced
 // +resourceName=iptables-eips
 
 type IptablesEIP struct {
